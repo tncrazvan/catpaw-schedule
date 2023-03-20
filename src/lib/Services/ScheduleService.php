@@ -2,9 +2,9 @@
 
 namespace CatPaw\Schedule\Services;
 
+use Amp\Loop;
 use CatPaw\Attributes\Service;
 use CatPaw\Queue\Services\QueueService;
-use CatPaw\Utilities\StandardDateFormat;
 use DateTime;
 
 #[Service]
@@ -15,13 +15,17 @@ class ScheduleService {
     }
 
     public function schedule(
-        int|string|DateTime $dateTime,
+        int|DateTime $due,
         callable $action,
     ) {
-        if(is_int($dateTime)) {
-            $dateTime = StandardDateFormat::dateTime()
-        } else if (is_string($dateTime)) {
-            $dateTime = StandardDateFormat::
+        $now = new DateTime();
+
+        if (is_int($due)) {
+            $delta = $due - $now->getTimestamp();
+        } else {
+            $delta = $due->getTimestamp() - $now->getTimestamp();
         }
+        
+        Loop::delay($delta * 1000, $action);
     }
 }
