@@ -40,8 +40,8 @@
     },
     "require": {
         "php": "^8.1",
-        "catpaw/core": "^0.6",
-        "catpaw/queue": "^0.5",
+        "catpaw/core": "^0.7",
+        "catpaw/queue": "^0.7",
         "amphp/amp": "^2.6",
         "amphp/file": "^2.0"
     },
