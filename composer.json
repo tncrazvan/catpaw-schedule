@@ -38,6 +38,7 @@
             "CatPaw\\Schedule\\": "src/lib/"
         }
     },
+    "minimum-stability": "dev",
     "require": {
         "php": "^8.2",
         "catpaw/core": "^0.7",
