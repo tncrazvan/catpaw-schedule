@@ -2,10 +2,11 @@
 
 namespace CatPaw\Schedule\Services;
 
-use Amp\Loop;
 use CatPaw\Attributes\Service;
 use CatPaw\Queue\Services\QueueService;
+use Closure;
 use Error;
+use Revolt\EventLoop;
 
 #[Service]
 class ScheduleService {
@@ -17,19 +18,19 @@ class ScheduleService {
     }
 
     /**
-     * @param  string   $due    a human readable string pattern indicating the due time.<br/>
-     *                          Example: <br/>
-     *                          - `in 2 minutes`
-     *                          - `in 1 week`
-     *                          - `in 3 months`
-     *                          - `in 1 year`
-     * @param  callable $action
-     * @throws Error    if the `$due` pattern is invalid.
+     * @param  string  $due    a human readable string pattern indicating the due time.<br/>
+     *                         Example: <br/>
+     *                         - `in 2 minutes`
+     *                         - `in 1 week`
+     *                         - `in 3 months`
+     *                         - `in 1 year`
+     * @param  Closure $action
+     * @throws Error   if the `$due` pattern is invalid.
      * @return void
      */
     public function schedule(
         string $due,
-        callable $action,
+        Closure $action,
     ) {
         if (!preg_match(self::PATTERN, $due, $matches)) {
             throw new Error("Invalid due pattern.");
@@ -38,14 +39,14 @@ class ScheduleService {
         [$_,$value,$unit] = $matches;
 
         $unit = match ($unit) {
-            'year','years' => 1000     * 60 * 60 * 24 * 365,
-            'month','months' => 1000   * 60 * 60 * 24 * 30,
-            'week','weeks' => 1000     * 60 * 60 * 24 * 7,
-            'day','days' => 1000       * 60 * 60 * 24,
-            'hour','hours' => 1000     * 60 * 60,
-            'minute','minutes' => 1000 * 60,
-            'second','seconds' => 1000,
-            default => $unit,
+            'year','years' => 60   * 60 * 24 * 365,
+            'month','months' => 60 * 60 * 24 * 30,
+            'week','weeks' => 60   * 60 * 24 * 7,
+            'day','days' => 60     * 60 * 24,
+            'hour','hours' => 60   * 60,
+            'minute','minutes' => 60,
+            'second','seconds' => 1,
+            default => 1,
         };
 
         if (is_string($unit)) {
@@ -60,6 +61,6 @@ class ScheduleService {
         
         $delta = $value * $unit;
 
-        $delta = Loop::delay($delta * 1000, $action);
+        $delta = EventLoop::delay($delta * 1000, $action);
     }
 }
